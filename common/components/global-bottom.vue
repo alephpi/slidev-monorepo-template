@@ -4,7 +4,7 @@ const href = "http://example.com";
 </script>
 
 <template>
-  <div class="absolute bottom-0 left-0 right-0 pl-2 z-10 text-white">
+  <div class="absolute bottom-0 left-0 right-0 pl-2 z-10">
     <slot name="left">
       [ロゴ] 2023 author:
       <a :href="href">

@@ -1,9 +1,9 @@
 {
-  "name": "@shinGangan/exp-slidev-monorepo",
-  "description": "Manage multiple slidev slides in pnpm workspace. Deploy to Cloudflare Pages.",
+  "name": "slidev-monorepo",
+  "description": "Manage multiple slidev slides in pnpm workspace.",
   "version": "0.1.0",
   "private": true,
-  "author": "shinGangan",
+  "author": "alephpi",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -29,7 +29,8 @@
   "dependencies": {
     "@slidev/cli": "^0.44.0",
     "@slidev/theme-default": "^0.21.2",
-    "@slidev/theme-seriph": "^0.21.3"
+    "@slidev/theme-seriph": "^0.21.3",
+    "playwright-chromium": "^1.45.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^2.1.3",
