@@ -191,6 +191,7 @@ So first element is the speaker space
 ---
 layout: pageBar
 ---
+
 # Speaker Model: PLDA
 How speakers are distributed in the feature space
 <br>
@@ -205,8 +206,8 @@ P(\mathbf{x}\mid\mathbf{y})&=\mathcal{N}(\mathbf{x}\mid\mathbf{y},\Phi_w)\\
 \end{aligned}
 $$
 
-$\Phi_w$: the within-class variance, characterize how speaker differs from each other.<br>
-$\Phi_b$: the between-class variance, characterize how speech differs within the same speaker.
+$\Phi_b$: the between-class variance, characterize how speaker differs from each other.<br>
+$\Phi_w$: the within-class variance, characterize how speech differs within the same speaker.
 
 ### About naming
 - Linear discriminant analysis by Gaussian Mixture point of view
