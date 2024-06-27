@@ -306,10 +306,6 @@ VBx plays as a baseline
    - multi-channel spatial information
 5. Hint from other level of information: semantic, emotional, articulatory.
 
-<br>
-
-Meanwhile, I try to avoid 💩⛰️ codebases (Kaldi, speechbrain)...
-
 ---
 layout: end
 ---
