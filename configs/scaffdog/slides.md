@@ -15,12 +15,6 @@ questions:
     initial: ["layouts/default"]
 ---
 
-<!--
-  @summary slidevで利用するslides.md
-  @description slidevにおける起点ファイル.必要に応じて pages/*.md などを適宜追加すれば良い
-  @param inputs.pj - プロジェクト名
- -->
-
 # `{{ inputs.pj }}/slides.md`
 
 ```markdown
@@ -49,11 +43,6 @@ mdc: true
 This file is created scaffdog.
 ```
 
-<!--
-  @summary 各プロジェクトのpackage.json
-  @param inputs.pj - プロジェクト名. name = cloudflare project name である
- -->
-
 # `{{ inputs.pj }}/package.json`
 
 ```json
@@ -70,10 +59,6 @@ This file is created scaffdog.
 }
 ```
 
-<!--
-  @summary 各スライドの上部に固定するコンポーネント
- -->
-
 # `{{ contains(inputs.layout, "global-top") || "!" }}{{ inputs.pj }}/global-top.vue`
 
 ```vue
@@ -85,11 +70,6 @@ import GlobalHeader from "../common/components/global-top.vue";
   <GlobalHeader />
 </template>
 ```
-
-<!--
-  @summary 各スライドの下部に固定するコンポーネント
-  @description 会社ロゴ, コピーライト, 会社名などを明示する際に利用する
- -->
 
 # `{{ contains(inputs.layout, "global-bottom") || "!" }}{{ inputs.pj }}/global-bottom.vue`
 
@@ -104,7 +84,7 @@ import GlobalFooter from "../common/components/global-bottom.vue";
 ```
 
 <!--
-  @summary default.vueをオーバーライドしたコンポーネント
+  @summary default.vue
  -->
 
 # `{{ contains(inputs.layout, "layouts/default") || "!" }}{{ inputs.pj }}/layouts/default.vue`
