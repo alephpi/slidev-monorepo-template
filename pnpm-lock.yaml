@@ -64,24 +64,11 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
 
-  24-06-27-Generative-Modeling-for-Speaker-Diarization/theme:
-    dependencies:
-      '@slidev/types':
-        specifier: ^v0.47.5
-        version: 0.47.5
-      codemirror-theme-vars:
-        specifier: ^0.1.2
-        version: 0.1.2
-      plotly.js-dist:
-        specifier: ^2.29.1
-        version: 2.33.0
-      prism-theme-vars:
-        specifier: ^0.2.4
-        version: 0.2.4
-    devDependencies:
-      playwright-chromium:
-        specifier: ^1.42.0
-        version: 1.45.0
+  25-02-27-Regularize-deep-speaker-embedding-by-HVAE: {}
+
+  25-09-29-Second-Year-CSI-Presentation: {}
+
+  AIDict: {}
 
   slide-example: {}
 

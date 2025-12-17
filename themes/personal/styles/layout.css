@@ -1,0 +1,75 @@
+:root {
+  /* default theme color */
+  /* can be overrided by uses `themeConfig` option */
+  --slidev-theme-primary: #5d8392;
+}
+
+.slidev-layout.cover {
+  @apply h-full grid;
+
+  h1 {
+    @apply text-6xl leading-20;
+
+    background-color: #fff;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    font-size: 55px;
+  }
+
+  h1 + p {
+    @apply -mt-0 opacity-50 mb-6;
+  }
+
+  p + h2,
+  ul + h2,
+  table + h2 {
+    @apply mt-10;
+  }
+
+  p {
+    padding-top: 0.2rem;
+    font-size: 1.75rem;
+  }
+
+  #date {
+    @apply text-2xl;
+  }
+
+  li p {
+    font-size: 1.25rem;
+    margin: 0.25rem;
+  } 
+  
+  li {
+    font-size: 1.25rem;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+  
+}
+
+.slidev-layout.pageBar {
+  /* @apply h-full grid; */
+
+  h1 {
+    font-size: 50px;
+
+    padding: 0.15rem 0;
+  }
+
+  h1 + p {
+    @apply -mt-1 opacity-50 mb-4;
+
+    font-size: 1.25rem;
+  }
+
+  p + h2,
+  ul + h2,
+  table + h2 {
+    @apply mt-10;
+  }
+}
