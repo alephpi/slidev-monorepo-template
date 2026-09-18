@@ -5,6 +5,15 @@
     "source.fixAll.eslint": "explicit"
   },
   "eslint.experimental.useFlatConfig": true,
-  "cSpell.userWords": ["textlint", "slidev", "scaffdog"],
-  "slidev.port": 3030
+  "cSpell.userWords": [
+    "textlint",
+    "slidev",
+    "scaffdog"
+  ],
+  "slidev.port": 3030,
+  "slidev.include": [
+    "**/slides.md",
+    "25-12-20-Machine-Learning-Seminar/slides.md",
+    "26-02-17-Drifting-Model/slides.md"
+  ]
 }

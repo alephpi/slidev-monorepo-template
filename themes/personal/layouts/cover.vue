@@ -89,4 +89,8 @@ console.log(instituteDict);
   right: 3%;
   bottom: 4%;
 }
+
+.cover h1 {
+  white-space: pre-line;
+}
 </style>
