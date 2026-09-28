@@ -39,9 +39,10 @@ console.log(instituteDict);
 <template>
   <div class="slidev-layout cover">
     <div class="my-auto w-full">
-      <h1 class="">{{ props.preTitle }}</h1>
-      <p class="text-white">{{ props.meeting }}</p>
-
+      <div class="text-white text-4xl font-bold">{{ props.preTitle }}</div>
+      <br>
+      <p class="text-white italic">{{ props.meeting }}</p>
+      <br>
       <div v-if="authorList.length" class="">
         <p v-if="authorList.length">
           <template v-for="(author, idx) in authorList">
@@ -49,18 +50,22 @@ console.log(instituteDict);
             <sup v-if="authorsDict[author].instituteNum.length > 0">
               <template v-for="(num, index) in authorsDict[author].instituteNum">
                 <span v-if="index > 0">, </span>
-                <span>{{ num }}</span>
+                <span style="color: white">{{ num }}</span>
               </template>
             </sup>
-            <span v-if="(idx < authorList.length - 1 && authorList.length >= 3)">, </span>
-            <span v-if="idx === authorList.length - 2"> and </span>
+            <span style="color: white" v-if="(idx < authorList.length - 1 && authorList.length >= 3)">, </span>
+            <!-- <span v-if="idx === authorList.length - 2">,</span> -->
           </template>
         </p>
         <p v-if="preDate" id="date" style="color: white">{{ preDate }}</p>
       </div>
 
       <slot> </slot>
-
+      <div v-if="Object.keys(instituteDict).length" class="institute-list">
+        <p v-for="(name, num) in instituteDict" :key="num" style="color: white; font-size: 1em;">
+          {{ name["number"] }}: {{ name["content"] }}
+        </p>
+      </div>
       <!-- <FootNote :filled="false" :separator="true" x="l" :footnotes="instituteDict" /> -->
       <img id="adasp" src="../public/adasp_red_whitebg_300px.png">
       <img id="telecom" src="../public/logo-telecom_ip_transp.svg"> </img>

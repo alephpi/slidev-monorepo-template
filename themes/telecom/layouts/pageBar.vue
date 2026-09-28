@@ -10,7 +10,7 @@
       <div class="absolute-blue-box"></div>
 
 
-      <BarBottom :title="$slidev.configs.preTitle"
+      <BarBottom :title="$slidev.configs.preTitleAbbr"
         :author="Object.keys($slidev.configs.authors[Object.keys($slidev.configs.authors)[0]])[0]"
         :meeting="$slidev.configs.meeting">
       </BarBottom>

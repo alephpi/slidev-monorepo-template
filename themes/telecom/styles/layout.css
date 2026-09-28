@@ -73,3 +73,9 @@
     @apply mt-10;
   }
 }
+
+/* .katex-html {
+      display: inline-block !important;
+      margin: 0 0.25rem !important;
+      vertical-align: middle !important;
+    } */
