@@ -243,7 +243,7 @@ layout: pageBar
 
 <v-click>
 
-<span class="text-red-600">Our contributions fall in the model-driven and multi-label classification paradigm.</span>
+<span text-red-600>Our contributions fall in the model-driven and multi-label classification paradigm.</span>
 </v-click>
 
 ---
@@ -341,7 +341,9 @@ $$\mathbf{x}_{nft} \sim \mathcal{N}_{\mathbb{C}}\left(0, \lambda_{nft}\mathbf{R}
 
 The mixture signal $\mathbf{x}_{ft}$ is the sum of the image signals of all speakers:
 
-$$\mathbf{x}_{ft}=\sum_{n=1}^{N}\mathbf{x}_{nft}=\mathcal{N}_{\mathbb{C}}\left(0, \sum_{n=1}^{N}\lambda_{nft}\mathbf{R}_{nf}\right).$$
+$$\mathbf{x}_{ft}=\sum_{n=1}^{N}\mathbf{x}_{nft}\sim\mathcal{N}_{\mathbb{C}}\left(0, \mathbf{Y}_{ft}\right).$$
+
+where $\mathbf{Y}_{nft}=\lambda_{nft}\mathbf{R}_{nf}$ and $\mathbf{Y}_{ft}=\sum_{n=1}^{N}\mathbf{Y}_{nft}$.
 
 <!-- This model is used in many multichannel source separation algorithms, such as Independent Vector Analysis (IVA) and Multichannel Nonnegative Matrix Factorization (MNMF). -->
 
@@ -349,107 +351,247 @@ $$\mathbf{x}_{ft}=\sum_{n=1}^{N}\mathbf{x}_{nft}=\mathcal{N}_{\mathbb{C}}\left(0
 layout: pageBar
 ---
 
-# NeuralFCA
+# Source separation with hybrid models
 <br>
 
-NeuralFCA proposes a deep spectral features, together with the common separation model
+### Neural Full-rank Covariance Analysis (Neural FCA)
+
+On top of the common generation model for multichannel source separation, the neural FCA introduces a deep generative model for the source PSD, with a deep spectral feature $\mathbf{z}_{nt}$ and a neural network $g_{\theta, f}(\cdot)$:
+$$
+\begin{aligned}
+\mathbf{z}_{nt}&\sim\mathcal{N}(\mathbf{0},\mathbf{I}),\\
+\lambda_{nft}&=g_{\theta, f}(\mathbf{z}_{nt}),\\
+\mathbf{x}_{ft}&\sim\mathcal{N}_{\mathbb{C}}\left(0, \mathbf{Y}_{ft}\right).
+\end{aligned}
+$$
+
+### Hybrid inference
+- Infer $g$ with variational autoencoder (VAE).
+- Infer $\lambda_{nft}$ and $\mathbf{R}_{nf}$ with iterative source steering method (ISS).
+
+**Blind source separation**: completely unsupervised, does not need supervised training with clean separated signals.
 
 ---
 layout: pageBar
 ---
 
-# NeuralFCASA
+# Joint separation and diarization
 <br>
 
-NeuralFCA proposed an unsupervised separation framework for multichannel mixtures.
+### Neural FCA with Speaker Activity (Neural FCASA) [Bando et al., 2024]
+Neural FCASA proposes a joint separation and diarization framework on top of the neural FCA, which incorporates speaker activity mask $u_{nt}\in \{0,1\}$ into the generation model:
 
-NeuralFCASA proposed a joint separation and diarization framework, which tries to do source separation with diarization annotations.
-- It is a weak supervision as it doesn't need clean separated signals of the mixtures.
+$$
+\mathbf{x}_{ft}\sim\mathcal{N}_{\mathbb{C}}\left(0, \mathbf{Y}_{ft}\right).
+$$
 
-Reversely, if we look from the diarization perspective, it only uses diarization annotation and the mixtures. And intuitively, diarization task reduce to VAD if we get clean separated signal, so jointly learn how to diarize and separate help each other.
+where $\mathbf{Y}_{ft}=\sum_{n=1}^{N}\textcolor{red}{u_{nt}}\lambda_{nft}\mathbf{R}_{nf}$.
 
-Compared to the data-driven models, it is data-efficient(90h) and parameter-efficient(~20M).
+- It only needs speaker annotated mixture signals for training.
+- It is data-efficient(90h) and parameter-efficient(~20M).
+
+From a separation perspective, it is a source separation model with diarization annotations as weak supervision. 
+
+<span text-red-600>From a diarization perspective, it is a diarization model incorporating prior knowledge from a source separation model.</span>
 
 ---
 layout: pageBar
 ---
 
-## Generative modeling of NeuralFCASA
+# Objective of neural FCASA
 <br>
 
-A deep latent source feature
-$$\mathbf{z}_{nt}\sim\mathcal{N}\left(\mathbf{0},\mathbf{I}\right),$$
-that generates the source power spectrum density (PSD)
-$$\lambda_{nft}=g_{\theta, f}(\mathbf{z}_{nt}),$$
-that generates the mixture signal PSD, with spatial covariance matrix and the speaker activity mask
-$$\mathbf{Y}_{ft}=\sum_{n=1}^{N}u_{nt}\underbrace{\lambda_{nft}\mathbf{R}_{nf}}_{\triangleq\mathbf{Y}_{nft}},$$
-Finally the mixture signal is realized as Gaussian variance modeling of the PSD
-$$\mathbf{x}_{ft}\sim\mathcal{N}_{\mathbb{C}}\left(\mathbf{0},\mathbf{Y}_{ft}\right).$$
-
----
-layout: pageBar
----
-
-## Diarization and separation under NeuralFCASA
-<br>
-
-The objective of joint diarization and separation task is formalized as obtaining two probabilitic models:
+Under neural FCASA framework, diarization and separation are formalized as solving two probabilitic models:
 
 <div text-center>
 
-Diarization: $p(\mathbf{U}\mid\mathbf{X})$ and Separation: $p(\mathbf{Z}\mid\mathbf{X})$
+Diarization: $p(\mathbf{U}\mid\mathbf{X})$, and Separation: $p(\mathbf{Z}\mid\mathbf{X})$
 
 </div>
 
-However it is intractable to learn $p(\mathbf{x})$ -> variational inference.
+However it is intractable to learn $p(\mathbf{X})$ -> variational inference.
 
 Proposing two surrogate models
 
 $$
 \begin{array}{l}
-q_{\mathbf{\phi}}(\mathbf{Z}\mid\mathbf{X})\triangleq\prod_{n,t,d=1}^{N,T,D}\mathcal{N}\left(z_{ntd}~;~{\mathbf{\mu}}_{\mathbf{\phi},ntd},{\mathbf{\sigma}}_{\mathbf{\phi},ntd}^{2}\right),\\
-q_{\mathbf{\phi}}(\mathbf{U}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Bernoulli}\left(u_{nt}~;~{\mathbf{\eta}}_{\mathbf{\phi},nt}\right).
+q_{\mathbf{\phi}}(\mathbf{Z}\mid\mathbf{X})\triangleq\prod_{n,t,d=1}^{N,T,D}\mathcal{N}(z_{ntd}~;~{\mathbf{\mu}}_{\mathbf{\phi},ntd},{\mathbf{\sigma}}_{\mathbf{\phi},ntd}^{2}),\\
+q_{\mathbf{\phi}}(\mathbf{U}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Bernoulli}(u_{nt};{\mathbf{\eta}}_{\mathbf{\phi},nt}),
 \end{array}
 $$
 
-and computing a tractable evidence lower bound (ELBO) for the likelihood
+and computing a tractable evidence lower bound (ELBO) for the likelihood.
+---
+layout: pageBar
+---
 
-<!-- **(ML estimation)** The models are derived by the joint model that maximize the observed likelihood:
+# Variational Inference (VI)
+<br>
 
 $$
+\log p_{\theta}(\mathbf{X},\mathbf{U})\geq\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{Z}\mid\mathbf{X})}[\log p_{\theta}(\mathbf{X}\mid\mathbf{U},\mathbf{Z})]}_{\mathcal{L}_{recons}^{(sep)}}
+\underbrace{-\mathrm{KL}[q_{\phi}(\mathbf{Z}\mid\mathbf{X})\mid\mid p_{\theta}(\mathbf{Z})]}_{\mathcal{L}_{kl}^{(sep)}}+\underbrace{\log p(\mathbf{U})}_{\mathcal{L}^{(diar)}},
+$$
+
+$\mathcal{L}_{recons}^{(sep)}$ and $\mathcal{L}_{kl}^{(sep)}$: ELBO [Kingma et al., 2014a] for separation model, with a teacher-forcing trick ($\mathbf{U}$).
+
+$\mathcal{L}^{(diar)}$: $\log p(\mathbf{U})$ is not defined in the generative model, instead, use $\log q_{\phi}(\mathbf{U}|\mathbf{X})$ as an approximation. Similar to semi-supervised VAE loss [Kingma et al., 2014b].
+
+<br>
+
+<div class="text-red-600">
+
+Can we define a prior model for the speaker label $\mathbf{U}$, so that we can perform variational inference for the diarization model as well?
+</div>
+
+---
+layout: pageBar
+---
+
+# Prior model for speaker activity 
+<br>
+
+A prior model for the speaker activity mask $\mathbf{U}$, which might intuitively capture prior knowledge about the speaker activity patterns, including:
+  1. the speaker's character, e.g., whether he/she is outgoing or shy to speak,
+  2. the ambiance of the conversation, e.g., whether it is encouraging or discouraging for the attendees to speak.
+
+As the speaker activity mask $\mathbf{U}$ is a binary variable, we propose to model it as a Bernoulli variable with a Beta prior:
+$$
+\begin{array}{l}{\eta_{nt}\sim\operatorname{Beta}(\alpha,\beta)}\\
+{u_{nt}\sim\operatorname{Bernoulli}(\eta_{nt})}\end{array}
+$$
+
+When combined with neural FCASA, we call it **Beta FCASA** [Mao et al., 2026a][^1].
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+[^1]: Neural Multichannel Distant Speaker Diarization and Source Separation with Beta Speaker Activity Prior
+
+---
+layout: pageBar
+---
+
+# VI in Beta FCASA
+<br>
+
+Inference model:
+$$
+{q_{\phi}(\mathbf{H}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Beta}\left(\eta_{nt}~\big|~\alpha_{\phi, nt},\beta_{\phi,nt}\right),}
+$$
+
+ELBO for the joint likelihood now becomes:
+$$
 \begin{aligned}
-\log p(x) = \log p(x,u) &= \log\int p(x,u,z) dz = \log \int p(x|u,z)p(u)p(z)dz\\
-&= \log \int p(x|u,z)p(z)dz + \log p(u)
+\log p_{\theta}(\mathbf{X},\mathbf{U})
+&\geq\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{Z}\mid\mathbf{X},\mathbf{U})}[\log p_{\theta}(\mathbf{X}\mid\mathbf{U},\mathbf{Z})]}_{\mathcal{L}_{recons}^{(sep)}}\underbrace{-D_{\mathrm{KL}}[q_{\phi}(\mathbf{Z}\mid\mathbf{X})\| p_{\theta}(\mathbf{Z})]}_{\mathcal{L}_{kl}^{(sep)}}\\
+&+\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{H})}[\log p_{\theta}(\mathbf{U}\mid\mathbf{H})]}_{\mathcal{L}_{recons}^{(diar)}}\underbrace{-D_{\mathrm{KL}}(q_{\phi}(\mathbf{H})\| p_{\theta}(\mathbf{H}))}_{\mathcal{L}_{kl}^{(diar)}},
 \end{aligned}
 $$
 
-Two problems:
-1. For separation likelihood: $p(x|u,z)$ and $p(z)$ are known by generative model assumptions, but the integral is intractable
-2. For diarization likelihood: $p(u)$ is unknown -->
+i.e., for the diarization likelihood, we optimize explicitly its ELBO function.
 
 ---
 layout: pageBar
 ---
 
-## Variational Inference
+# Tractablitity of the ELBO
 <br>
 
-<!-- $$
-\begin{aligned}\log\int p(x|u,z)p(z) dz &= \log \int q(z)\frac{p(x|u,z)p(z)}{q(z)} dz \geq \int q(z)\log\frac{p(x|u,z)p(z)}{q(z)} dz \\ &= \mathbb{E}_{q(z)} [\log p(x|u,z)]-\text{KL}[q(z)\|p(z)]\\\end{aligned}
-$$ -->
+- The separation part: standard (Gaussian) VAE ELBO, tractable (See VAE paper [Kingma et al., 2014a])
+- The diarization part: 
+  - Reconstruction loss: use Beta-Bernoulli conjugacy
+    $$u\psi(\alpha_\phi)+(1-u)\psi(\beta_\phi)-\psi(\alpha_\phi+\beta_\phi)$$
 
-$$
-\begin{aligned}\log p_{\theta}\left(\mathbf{X}\right)&=\log\int p_{\theta}\left(\mathbf{X},\mathbf{U},\mathbf{Z}\right)d\mathbf{U}d\mathbf{Z}\\&=\log\int p_{\theta}\left(\mathbf{X},\mathbf{U},\mathbf{Z}\right)\frac{q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)}{q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)}d\mathbf{U}d\mathbf{Z}\\&\geq\mathbb{E}_{q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)}\left(\log\left(p_{\theta}\left(\mathbf{U},\mathbf{Z},\mathbf{X}\right)\right)\right)-\mathbb{E}_{q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)}\left(\log\left(q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)\right)\right)\\&=\mathbb{E}_{q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)}\left(\log\left(p_{\theta}\left(\mathbf{X}\mid\mathbf{U},\mathbf{Z}\right)p_{\theta}\left(\mathbf{Z}\mid\mathbf{X}\right)p_{\theta}\left(\mathbf{U}\mid\mathbf{X}\right)\right)\right)\\&-\mathbb{E}_{q_{\phi}\left(\mathbf{U}\mid\mathbf{X}\right)q_{\phi}\left(\mathbf{Z}\mid\mathbf{X}\right)}\left(\log\left(q_{\theta}\left(\mathbf{U}\mid\mathbf{X}\right)q_{\theta}\left(\mathbf{Z}\mid\mathbf{X}\right)\right)\right)\\&=\underbrace{\mathbb{E}_{q_{\phi}\left(\mathbf{U},\mathbf{Z}\mid\mathbf{X}\right)}\left(\log p_{\theta}\left(\mathbf{X}\mid\mathbf{U},\mathbf{Z}\right)\right)-\mathrm{KL}\left(q_{\phi}\left(\mathbf{Z}\mid\mathbf{X}\right)\mid\mid p_{\theta}\left(\mathbf{Z}\mid\mathbf{X}\right)\right)}_{\triangleq\frac{1}{FT}\mathcal{L}^{\left(\mathrm{sep}\right)}}\\&\underbrace{-\mathrm{KL}\left(q_{\phi}\left(\mathbf{U}\mid\mathbf{X}\right)\mid\mid p_{\theta}\left(\mathbf{U}\mid\mathbf{X}\right)\right)}_{\triangleq\frac{1}{NT}\mathcal{L}^{\left(\text{diar}\right)}}\end{aligned}
-$$
+  - KL divergence: use the closed-form of KL divergence between two Beta distributions
+    $$\ln\frac{\Gamma(\alpha_\phi+\beta_\phi)\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)\Gamma(\alpha_\phi)\Gamma(\beta_\phi)}+(\alpha_\phi-\alpha)\psi(\alpha_\phi)+(\beta_\phi-\beta)\psi(\beta_\phi)-(\alpha_\phi+\beta_\phi-\alpha-\beta)\psi(\alpha_\phi+\beta_\phi)$$
+  where $\psi(\cdot)$ is the digamma function and $\Gamma(\cdot)$ is the gamma function.
 
 ---
 layout: pageBar
 ---
 
-# Improve the separation model
+# A subtlety of the Beta distribution
 <br>
 
-The Gaussian variance modeling assumes the Gaussianity of speech signal, however speech is more heavy-tailed, thus we consider a heavy-tailed extension to the variance modeling in the separation model, under the Gaussian Scalar Mixture (GSM) model formulation:
+Under the canonical parametrization, the PDF of Beta distribution is:
+$$\mathrm{Beta}(u;\alpha,\beta) = \frac{u^{\alpha-1}(1-u)^{\beta-1}}{B(\alpha,\beta)}, \quad u \in (0, 1)$$
+
+- the shape parameters $\alpha$ and $\beta$ has no interpretable statistical meaning.
+- Reparametrization in terms of *mode* $m$ and *concentration* $\lambda$ by the PERT parametrization (Malcolm et al. 1959):
+
+$$
+\begin{align*}
+\mathrm{PERT}&:(\alpha,\beta) \mapsto \left(\frac{\alpha-1}{\alpha+\beta-2},\alpha+\beta-2\right),\\
+\mathrm{PERT}^{-1}&: (m,\lambda) \mapsto (1 + \lambda m, 1 + \lambda ( 1 - m ))
+\end{align*}
+$$
+
+This is a differentiable bijection for $\alpha,\beta>1$.
+
+---
+layout: twoCols
+hideInToc: true
+---
+
+# A subtlety of the Beta distribution
+<br>
+
+An illustration of the shape of Beta distribution w.r.t. its parametrization:
+
+::left::
+<img class="w-100" src="/beta-distribution.png"/>
+
+::right::
+<img class="w-100" src="/beta-pert.png"/>
+
+::bottom::
+In short, under PERT parametrization, we can directly optimize the shape.
+
+---
+layout: pageBar
+---
+
+# Wrap-up
+<br>
+
+<div class="flex mt-3 justify-center">
+<img class="h-100" src="/beta-overview.png"/>
+</div>
+
+---
+layout: twoCols
+---
+
+# Experiments and results
+<br>
+
+::left::
+We choose different $m,\lambda$ for the prior model $p(\mathbf{H})$, and verify our methods on the AMI dataset.
+- We observe consistently better performance than the baseline model (without Beta prior).
+- $\lambda$ has less impact on the results, comparing to $m$.
+- Following experiments on AliMeeting and CHiME-6 demonstrates the efficacy of our methods on broader datasets
+
+::right::
+<br>
+<img src="/beta-result.png"/>
+
+---
+layout: pageBar
+---
+
+# Heavy-tailed separation model
+<br>
+
+- Gaussian variance modeling assumes the Gaussianity of speech signal.
+- However speech signal shows more **heavy-tailedness**.
+- We consider a heavy-tailed extension to the variance modeling in the **separation model**!
+
+Under the **Gaussian Scalar Mixture (GSM)** model formulation:
 
 $$
 s_{nft}|r_{ft} \sim \mathcal{N}_{\mathbb{C}}(0,r_{ft} \lambda_{nft})
@@ -461,64 +603,134 @@ $$
 \begin{array}{rlr}&{\mathbf{x}_{ft}\sim\mathcal{GG}_{\mathbb{C}}^{\beta}\left(0,\mathbf{Y}_{ft}\right)}&{\mathrm{(Leptokurtic)},}&\\
 &{\mathbf{x}_{ft}\sim\mathcal{T}_{\mathbb{C}}^{\nu}\left(0,\mathbf{Y}_{ft}\right)}&{\mathrm{(Student~s~t)},}\end{array}
 $$
+<!-- Notice that the vanilla Gaussian variance implies $r$ is a deterministic variable. -->
 
-Notice that the vanilla Gaussian variance implies $r$ is a deterministic variable.
-
----
-layout: pageBar
----
-## Result
+Combined with the neural FCASA, we call this **Heavy-tailed FCASA** [Mao et al., 2026b][^2]
 <br>
 
-<img src="/result1.png"/>
-
----
-layout: pageBar
----
-
-# Improvement the diarization model
 <br>
 
-The neuralFCASA doesn't implement a prior model over the diarization model, making the hybrid model not fully Bayesian. Also, what if we suppose the speaker activity follows a common prior as a regularization?
-
-For Bernoulli variables, a common choice is the Beta prior (as the Bayesian conjugate prior)
-
-$$
-\begin{array}{l}{\eta_{nt}\sim\operatorname{Beta}(\alpha,\beta)}\\
-{u_{nt}\sim\operatorname{Bernoulli}(\eta_{nt})}\end{array}
-$$
-
-To solve, still use variational inference, with the following inference model:
-
-$$
-{q_{\phi}(\mathbf{H}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Beta}\left(\eta_{nt}~\big|~\alpha_{\phi, nt},\beta_{\phi,nt}\right),}
-$$
+[^2]: Neural Multichannel Distant Speaker Diarization with Heavy-tailed Source Separation Model
 
 ---
 layout: pageBar
 ---
 
-## Variantional Inference
+# VI in Heavy-tailed FCASA
 <br>
 
-$$
-\begin{aligned}\log p(x,u) &= \log\int p(x,u,\pi,z) d\pi dz\\ &= \log \int q(\pi,z)\frac{p(x|u,z)p(u|\pi)p(z)p(\pi)}{q(\pi,z)} d\pi dz \\&\geq \int q(\pi,z)\log\frac{p(x|u,z)p(u|\pi)p(z)p(\pi)}{q(\pi,z)} d\pi dz \\ &= \mathbb{E}_{q(\pi)q(z)} [\log p(x|u,z)p(u|\pi)]-\text{KL}[q(z)\|p(z)] -\text{KL}[q(\pi)\|p(\pi)]\\&=\underbrace{\mathbb{E}_{q(\pi)q(z)} [\log p(x|u,z)]-\text{KL}[q(z)\|p(z)]}_{\mathcal{L}_{sep}} +\underbrace{\mathbb{E}_{q(\pi)} [\log p(u|\pi)]-\text{KL}[q(\pi)\|p(\pi)]}_{\mathcal{L}_{diar}} \end{aligned}
-$$
+Inference model: same
+
+ELBO function: 
+
+1. $\mathcal{L}_{recons}^{(sep)}$ changes to the heavy-tailed version.
+2. $\mathcal{L}_{kl}^{(sep)}$ remains the same as in the Gaussian case, as the prior of the latent feature $\mathbf{z}$ remains the same.
+3. $\mathcal{L}^{(diar)}$ remains the same.
 
 ---
 layout: pageBar
 ---
-## Result
+
+# Shape parameters of the heavy-tailedness
 <br>
 
-<div class="flex mt-3">
-<img class="h-100" src="/result2.png"/>
+The Leptokurtic Generalized Gaussian distribution and the Student's t-distribution have **shape parameters** $\nu \in [0,2)$ and $\beta \in (0,+\infty)$, respectively. The shape parameter controls the degree of heavy-tailedness.
 
-<div>
-Consistently better than the baseline model without Beta prior.
+<div class="flex mt-3 justify-center">
+<img class="h-80" src="/heavy-tail-models.png"/>
 </div>
 
+---
+layout: pageBar
+---
+
+# Wrap-up
+<br>
+
+<div class="flex mt-3 justify-center">
+<img class="h-100" src="/heavy-overview.png"/>
 </div>
+
+---
+layout: twoCols
+---
+
+# Experiments and results
+<br>
+
+::left::
+We choose different shape parameters for the two heavy-tailed models and verify their effectiveness on the AMI dataset.
+
+- For some shape parameters, we observe consistently better performance than the baseline model (without heavy-tailed variance modeling).
+- Following experiments on AliMeeting and CHiME-6 demonstrates the efficacy of our methods on broader datasets
+
+::right::
+<br>
+<img src="/heavy-result1.png"/>
+<img src="/heavy-result2.png"/>
+
+---
+layout: twoCols
+---
+
+# Joint Heavy-tailed and Beta FCASA
+<br>
+
+::left::
+We combine both improvements together as they are independent modifications on the neural FCASA.
+- We choose $m=0.5,\lambda=4.0$ for the Beta FCASA and $\nu=1$ for the Heavy-tailed FCASA with Student's t-distribution.
+- We notice that the heavy-tailed FCASA and Beta FCASA model are compatible, the joint FCASA model, leading to better performance than individual improvements on AMI dataset.
+- On AliMeeting and CHiME-6 datasets, the joint FCASA model consistently outperforms the baseline.
+
+::right::
+
+<img class="w-100%" src="/joint-result.png"/>
+
+---
+layout: twoCols
+ratio: "2:1"
+gap: 0px
+---
+
+# Conclusions
+<br>
+
+::left::
+### Conclusions
+In the joint modeling of separation and diarization:
+- A heavy-tailed separation model improves the diarization performance.
+- A Beta speaker prior model improves the diarization performance.
+- Joint improvements are compatible and usually better than individual ones.
+
+<br>
+
+### Limitations
+- Heavy-tailed FCASA is sensitive to hyperparameter tuning.
+- Optimal combination of joint FCASA hyperparameters are not well searched.
+- Threshold selection for the diarization model is not investigated.
+- No evaluation on separation metrics.
+- Evaluation of both improvements are tested only in joint modeling condition.
+
+<br>
+
+::right::
+### Open-source link
+[alephpi/neural-fcasa](https://github.com/alephpi/neural-fcasa)
+
+<br>
+<img class="h-30" src="/github-qr-code.png" alt="GitHub" />
+
+---
+layout: pageBar
+---
+
+# Future Work
+<br>
+
+- Address aforementioned limitations.
+- Incorporate geometric configuration of the microphone array.
+- Incorporate more complex conversational dynamics.
+- Incorporate speaker localization task.
 
 ---
 layout: end
