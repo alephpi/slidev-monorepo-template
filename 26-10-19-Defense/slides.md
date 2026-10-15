@@ -20,23 +20,13 @@ hideInToc: true
 ---
 
 # Outline
+<br>
 
-<Toc/>
-
-<!-- 
-1. what is speaker diarization: data, objective
-2. challenges in speaker diarization
-3. three paradigms in speaker diarization
-4. model-driven paradigm and neural fcasa
-5. variational autoencoder
-6. multi-label classification
-7. speech separation signal processing model and generative modeling of NeuralFCASA
-8. variational inference for joint diarization and separation
-9. improvement of separation model
-10. improvement of diarization model
-11. joint improvements
-12. conclusion
- -->
+1. Overview of speaker diarization
+2. Paradigms of speaker diarization
+3. Neural FCASA: joint modeling of diarization and separation
+4. Our contributions: Beta FCASA and Heavy-tailed FCASA
+5. Conclusion
 
 ---
 layout: pageBar
@@ -329,7 +319,7 @@ layout: pageBar
 
 # Model-driven separation
 <br>
-We begin with a common generative model for multichannel source separation. [add ref]
+We begin with a common generative model for multichannel source separation.
 
 Given $f,t$ as the frequency and time indices of a TF-domain representation. Denote $\lambda_{nft}$ the **power spectrum density (PSD)** of speaker $n$, the signal $s_{nft}$ is generated from the **Gaussian variance modeling**:
 
@@ -683,13 +673,13 @@ We combine both improvements together as they are independent modifications on t
 - On AliMeeting and CHiME-6 datasets, the joint FCASA model consistently outperforms the baseline.
 
 ::right::
-
+<br>
 <img class="w-100%" src="/joint-result.png"/>
 
 ---
 layout: twoCols
 ratio: "2:1"
-gap: 0px
+gap: 10px
 ---
 
 # Conclusions
