@@ -79,13 +79,13 @@ hideInToc: true
 - The two types of variability are **entangled**.
 </div>
   
-<div v-click="2">
+<!-- <div v-click="2">
 
 ### Relative versus Absolute
 
 - Relative: numbers are relative labels, e.g., anonymous speakers.
 - Absolute: numbers are absolute labels, e.g., figures in MNIST.
-</div>
+</div> -->
 
 ::right::
 <div v-click="1">
@@ -105,31 +105,32 @@ layout: pageBar
 <v-click>
 
 ### Speech variability in general
-- Intra-speaker variability: phone, prosody, emotion... (more time varying)
+<!-- - Intra-speaker variability: phone, prosody, emotion... (more time varying)
 - Inter-speaker variability: timbre, accent... (less time varying)
 - They are entangled.
-- Hard to define speaker identity in "positive terms" but rather specifying the differences and "modulo" them.
+- Hard to define speaker identity in "positive terms" but rather specifying the differences and "modulo" them. -->
+- phone, prosody, emotion
+- timbre, accent
+- They are entangled.
 </v-click>
 
 <v-click>
 
 ### Speech variability in meeting scenario
-- Complex acoustic environment: noise, reverberation.
-- Complex speech dynamics: overlap speech, indetermined number of speakers.
+<!-- - Complex acoustic environment: noise, reverberation.
+- Complex speech dynamics: overlap speech, indetermined number of speakers. -->
+- noise, reverberation.
+- overlap speech, unknown number of speakers.
 </v-click>
 
 <v-click>
 
 ### Data scarcity
-- The amount of labeled data is limited, e.g., AMI corpus (~100 h).
-- The effective information in speech data is low, e.g., 3 mins of audio (30MB) $\approx$ 10 million of characters.
+<!-- - The amount of labeled data is limited, e.g., AMI corpus (~100 h).
+- The effective information in speech data is low, e.g., 3 mins of audio (30MB) $\approx$ 10 million of characters. -->
+- Limited labeled data, e.g., AMI corpus (~100 h).
+- Low effective information, e.g., 3 mins of audio $\approx$ 10 million of characters $\approx$ 30MB.
 </v-click>
-
-<!-- ### method
-- Data-driven: large synthetic data(10K hours) + large Transformer model (EEND, 60M) -> recently jointly modeled as a General-ASR task with LLM backbone (VibeVoice-ASR, 9B), dominates signal channel diarization.
-- Model-driven: particularly with signal models to exploit multi-channel information.
-
-This presentation: **multichannel diarization with source separation models** -->
 
 ---
 layout: twoCols
@@ -141,8 +142,9 @@ layout: twoCols
 <v-click>
 
 ### Entangled variabilities -> representation learning
-- Minimize intra-speaker variability and maximize inter-speaker variability
-- Representations are more separable hence identities are more distinguishable.
+- Minimize intra-speaker variability and maximize inter-speaker variability.
+- Representations are more separable.
+<!-- - Representations are more separable hence identities are more distinguishable. -->
 
 </v-click>
 <br>
@@ -150,8 +152,10 @@ layout: twoCols
 
 ### Data scarcity -> generative modeling
 
-- Incorporate prior knowledge to compensate the lack of data
-- Compression of information via generative models
+- Incorporate prior knowledge.
+- Compress information.
+<!-- - Incorporate prior knowledge to compensate the lack of data
+- Compression of information via generative models -->
 </v-click>
 
 ::left::
@@ -190,17 +194,27 @@ layout: pageBar
 # Evaluation metrics
 <br>
 
-To evaluate the performance of diarization system, we typically use the **Diarization Error Rate (DER)**, which includes three types of errors:
+### Diarization Error Rate (DER): 
+Evalutes three types of errors:
+<!-- To evaluate the performance of diarization system, we typically use the **Diarization Error Rate (DER)**, which includes three types of errors:
 - **Missed** (Miss): a frame belongs to some speaker while it is not predicted to that speaker.
 - **False alarm** (FA): a frame belongs to no speaker while it is predicted to some speaker.
-- **Speaker confusion** (Conf.): a frame belongs to one speaker while it is predicted to another speaker.
+- **Speaker confusion** (Conf.): a frame belongs to one speaker while it is predicted to another speaker. -->
 
-The DER is computed as:
+<!-- The DER is computed as: -->
+
+- **Missed** (Miss): a frame with speaker -> silence.
+- **False alarm** (FA): a silent frame -> some speaker.
+- **Speaker confusion** (Conf.): a frame with speaker A -> speaker B.
 $$
 \mathrm{DER} = \frac{\mathrm{FA} + \mathrm{Miss} + \mathrm{Conf.}}{\text{Total annotated duration}}
 $$
 
-Another commonly used metric is the **Jaccard Error Rate (JER)**, which evaluates the error rate speaker-wise:
+<!-- <br> -->
+
+### Jaccard Error Rate (JER)
+<!-- Another commonly used metric is the **Jaccard Error Rate (JER)**, which evaluates the error rate speaker-wise: -->
+Evaluates the error rate speaker-wise:
 
 $$
 \mathrm{JER}=\frac1{N_{ref}}\sum_i^{N_{ref}}\frac{\mathrm{FA_i+Miss_i}}{\mathrm{TOTAL_i}}
@@ -218,7 +232,8 @@ layout: pageBar
   - Large data for end-to-end training (e.g. EEND [Fujita et al., 2020])
   - Large parameter with LLM backbone (e.g. VibeVoice-ASR [Peng et al., 2026])
 
-- Model-driven: particularly with signal models to exploit **multi-channel** information.
+- Model-driven/Hybrid: Exploit prior knowledge with DSP models. 
+<!-- - Particularly with signal models to exploit **multi-channel** information. -->
 
 <br>
 
@@ -226,9 +241,9 @@ layout: pageBar
 
 ### Paradigms based on the modeling objective
 
-- Segmentation-clustering paradigm: traditional models with modular pipeline
-- Multi-label classification paradigm: end-to-end neural network model
-- Text-generation paradigm: regarding speaker diarization as a text generation problem
+- Segmentation-clustering
+- Multi-label classification
+- <span text-gray> Text-generation </span>
 </v-click>
 
 <v-click>
@@ -255,10 +270,10 @@ layout: twoCols
 ::bottom::
 <v-click>
 
-### Components
+### Core components
 - Speaker embedding extractor
-  - Representation learning using classification head and discriminative loss, e.g., cross-entropy loss, margin loss.
-  - Can be trained only on massive single speaker recordings rather than labeled meeting data.
+  - Representation learning with discriminative loss, e.g., cross-entropy loss, margin loss.
+  - Trained on single speaker recordings only.
 - Scoring method: cosine similarity (simple) v.s. PLDA (probabilistic).
 - Clustering algorithm: AHC (time-independent) v.s. VB-HMM (time-dependent).
 
@@ -270,22 +285,20 @@ layout: pageBar
 # Multi-label classification paradigm
 <br>
 
-### End-to-end neural diarization (EEND)
-- Formulate the speaker diarization as a per-frame multi-label classification problem.
-- Permutation invariant training (PIT) to handle the label ambiguity.
-- Model the speaker variability and time variability jointly. 
-- Synthetic conversational speech from single-speaker recordings to compensate for the data scarcity.
+### End-to-end neural diarization (EEND) [add a figure here and add a citation]
+- Per-frame multi-label classification formulation.
+- Permutation-invariant training (PIT) handles the label ambiguity.
+- Model the speaker- & time- variability.
+- Large synthetic data.
 
 <br>
 
 ### Following works
-- Stronger backbone to improve time dynamic modeling: EEND-EDA.
+- Stronger time-modeling backbone: EEND-EDA.
 - Leverage multi-channel information: Multi-channel EEND.
 - Joint source separation and diarization: EEND-SS.
 
-However, these models are still problematic:
-1. Still data-driven therefore data-hungry.
-2. Gap between synthetic data and real conversational speech.
+However, these models are still problematic: data-hungry, synthetic v.s. real gap.
 
 ---
 layout: pageBar
@@ -294,15 +307,17 @@ layout: pageBar
 # Model-driven diarization?
 <br>
 
-#### Q: Can we incorporate prior knowledge of into diarization model to reduce the requirement training data?
-
-#### A: We don't know how. We have little knowledge on the **speaker identity** or the **conversational dynamics**.
+#### Q: Can we incorporate prior knowledge into diarization model?
+#### A: We have little knowledge on the **speaker identity** or the **conversational dynamics** 🙁.
 <br>
 
 #### Q: Can other task help?
 #### A: Yes! For example the source separation (SS) task.
-- Intuitively, if we separate the sources perfectly, the diarization task becomes simply VAD.
-- Experimentally, EEND-SS demonstrates the helpfulness.
+- Intuitively, perfect separation makes the diarization simply VAD.
+- Experimentally, EEND-SS proves the effectiveness.
+
+<!-- - Intuitively, if we separate the sources perfectly, the diarization task becomes simply VAD.
+- Experimentally, EEND-SS demonstrates the helpfulness. -->
 
 <br>
 
@@ -319,13 +334,15 @@ layout: pageBar
 
 # Model-driven separation
 <br>
-We begin with a common generative model for multichannel source separation.
 
-Given $f,t$ as the frequency and time indices of a TF-domain representation. Denote $\lambda_{nft}$ the **power spectrum density (PSD)** of speaker $n$, the signal $s_{nft}$ is generated from the **Gaussian variance modeling**:
+A common **generative model** for multichannel SS. Consider the representation in TF domain with $f$ and $t$ as the frequency and time indices.
+<!-- We begin with a common generative model for multichannel source separation. -->
+
+Denote $\lambda_{nft}$ the **PSD** of speaker $n$, the signal $s_{nft}$ is generated from the **Gaussian variance modeling**:
 
 $$s_{nft} \sim \mathcal{N}_{\mathbb{C}}\left(0, \lambda_{nft}\right),$$
 
-The image signal $\mathbf{x}_{nft}$ is generated from the source signal $s_{nft}$ modulated by the spatial covariance matrix $\mathbf{R}_{nf}$:
+The image signal $\mathbf{x}_{nft}$ is generated from the source signal $s_{nft}$ modulated by the **SCM** $\mathbf{R}_{nf}$:
 
 $$\mathbf{x}_{nft} \sim \mathcal{N}_{\mathbb{C}}\left(0, \lambda_{nft}\mathbf{R}_{nf}\right).$$
 
@@ -346,7 +363,8 @@ layout: pageBar
 
 ### Neural Full-rank Covariance Analysis (Neural FCA)
 
-On top of the common generation model for multichannel source separation, the neural FCA introduces a deep generative model for the source PSD, with a deep spectral feature $\mathbf{z}_{nt}$ and a neural network $g_{\theta, f}(\cdot)$:
+A **deep generative model** for the source PSD, with a deep spectral feature $\mathbf{z}_{nt}$ and a neural network $g_{\theta, f}(\cdot)$:
+<!-- On top of the common generation model for multichannel source separation, the neural FCA introduces a deep generative model for the source PSD, with a deep spectral feature $\mathbf{z}_{nt}$ and a neural network $g_{\theta, f}(\cdot)$: -->
 $$
 \begin{aligned}
 \mathbf{z}_{nt}&\sim\mathcal{N}(\mathbf{0},\mathbf{I}),\\
@@ -359,7 +377,8 @@ $$
 - Infer $g$ with variational autoencoder (VAE).
 - Infer $\lambda_{nft}$ and $\mathbf{R}_{nf}$ with iterative source steering method (ISS).
 
-**Blind source separation**: completely unsupervised, does not need supervised training with clean separated signals.
+**Blind source separation**: completely unsupervised, no need of clean separated signals.
+<!-- **Blind source separation**: completely unsupervised, does not need supervised training with clean separated signals. -->
 
 ---
 layout: pageBar
@@ -369,7 +388,7 @@ layout: pageBar
 <br>
 
 ### Neural FCA with Speaker Activity (Neural FCASA) [Bando et al., 2024]
-Neural FCASA proposes a joint separation and diarization framework on top of the neural FCA, which incorporates speaker activity mask $u_{nt}\in \{0,1\}$ into the generation model:
+A joint separation and diarization framework that incorporates speaker activity mask $u_{nt}\in \{0,1\}$:
 
 $$
 \mathbf{x}_{ft}\sim\mathcal{N}_{\mathbb{C}}\left(0, \mathbf{Y}_{ft}\right).
@@ -379,10 +398,11 @@ where $\mathbf{Y}_{ft}=\sum_{n=1}^{N}\textcolor{red}{u_{nt}}\lambda_{nft}\mathbf
 
 - It only needs speaker annotated mixture signals for training.
 - It is data-efficient(90h) and parameter-efficient(~20M).
+<!-- so we can only use real data -->
 
-From a separation perspective, it is a source separation model with diarization annotations as weak supervision. 
+From a separation perspective: a separation model with diarization annotations as weak supervision. 
 
-<span text-red-600>From a diarization perspective, it is a diarization model incorporating prior knowledge from a source separation model.</span>
+<span text-red-600>From a diarization perspective: a diarization model incorporating prior knowledge from SS.</span>
 
 ---
 layout: pageBar
@@ -391,7 +411,7 @@ layout: pageBar
 # Objective of neural FCASA
 <br>
 
-Under neural FCASA framework, diarization and separation are formalized as solving two probabilitic models:
+Diarization and separation are formalized as solving two probabilitic models:
 
 <div text-center>
 
@@ -399,7 +419,7 @@ Diarization: $p(\mathbf{U}\mid\mathbf{X})$, and Separation: $p(\mathbf{Z}\mid\ma
 
 </div>
 
-However it is intractable to learn $p(\mathbf{X})$ -> variational inference.
+However it is intractable to learn $p(\mathbf{X,U})$ -> variational inference.
 
 Proposing two surrogate models
 
@@ -425,13 +445,14 @@ $$
 
 $\mathcal{L}_{recons}^{(sep)}$ and $\mathcal{L}_{kl}^{(sep)}$: ELBO [Kingma et al., 2014a] for separation model, with a teacher-forcing trick ($\mathbf{U}$).
 
-$\mathcal{L}^{(diar)}$: $\log p(\mathbf{U})$ is not defined in the generative model, instead, use $\log q_{\phi}(\mathbf{U}|\mathbf{X})$ as an approximation. Similar to semi-supervised VAE loss [Kingma et al., 2014b].
+$\mathcal{L}^{(diar)}$: The prior $p(\mathbf{U})$ is not defined in the generative model, instead, use $\log q_{\phi}(\mathbf{U}|\mathbf{X})$ as an approximation. Similar to semi-supervised VAE loss [Kingma et al., 2014b].
 
 <br>
 
 <div class="text-red-600">
 
-Can we define a prior model for the speaker label $\mathbf{U}$, so that we can perform variational inference for the diarization model as well?
+Q: Define a prior model for the speaker label $\mathbf{U}$ to enable VI for the diarization model as well?
+<!-- Can we define a prior model for the speaker label $\mathbf{U}$, so that we can perform VI for the diarization model as well? -->
 </div>
 
 ---
@@ -441,19 +462,19 @@ layout: pageBar
 # Prior model for speaker activity 
 <br>
 
-A prior model for the speaker activity mask $\mathbf{U}$, which might intuitively capture prior knowledge about the speaker activity patterns, including:
-  1. the speaker's character, e.g., whether he/she is outgoing or shy to speak,
-  2. the ambiance of the conversation, e.g., whether it is encouraging or discouraging for the attendees to speak.
-
 As the speaker activity mask $\mathbf{U}$ is a binary variable, we propose to model it as a Bernoulli variable with a Beta prior:
 $$
 \begin{array}{l}{\eta_{nt}\sim\operatorname{Beta}(\alpha,\beta)}\\
 {u_{nt}\sim\operatorname{Bernoulli}(\eta_{nt})}\end{array}
 $$
 
-When combined with neural FCASA, we call it **Beta FCASA** [Mao et al., 2026a][^1].
 <br>
 
+Intuitively, the prior model may capture prior knowledge about the speaker activity patterns, including:
+  1. the speaker's character, e.g., whether he/she is outgoing or shy to speak,
+  2. the ambiance of the conversation, e.g., whether it is encouraging or discouraging for the attendees to speak.
+
+When combined with neural FCASA, we call it **Beta FCASA** [Mao et al., 2026a][^1].
 <br>
 
 <br>
@@ -494,10 +515,10 @@ layout: pageBar
 
 - The separation part: standard (Gaussian) VAE ELBO, tractable (See VAE paper [Kingma et al., 2014a])
 - The diarization part: 
-  - Reconstruction loss: use Beta-Bernoulli conjugacy
+  - $\mathcal{L}_{recons}^{(diar)}$: use Beta-Bernoulli conjugacy
     $$u\psi(\alpha_\phi)+(1-u)\psi(\beta_\phi)-\psi(\alpha_\phi+\beta_\phi)$$
 
-  - KL divergence: use the closed-form of KL divergence between two Beta distributions
+  - $\mathcal{L}_{kl}^{(diar)}$: use the closed-form of KL divergence between two Beta distributions
     $$\ln\frac{\Gamma(\alpha_\phi+\beta_\phi)\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)\Gamma(\alpha_\phi)\Gamma(\beta_\phi)}+(\alpha_\phi-\alpha)\psi(\alpha_\phi)+(\beta_\phi-\beta)\psi(\beta_\phi)-(\alpha_\phi+\beta_\phi-\alpha-\beta)\psi(\alpha_\phi+\beta_\phi)$$
   where $\psi(\cdot)$ is the digamma function and $\Gamma(\cdot)$ is the gamma function.
 
@@ -562,9 +583,9 @@ layout: twoCols
 
 ::left::
 We choose different $m,\lambda$ for the prior model $p(\mathbf{H})$, and verify our methods on the AMI dataset.
-- We observe consistently better performance than the baseline model (without Beta prior).
-- $\lambda$ has less impact on the results, comparing to $m$.
-- Following experiments on AliMeeting and CHiME-6 demonstrates the efficacy of our methods on broader datasets
+- Consistently better performance than the baseline.
+- $\lambda$ has less impact than $m$.
+- Efficacy on AliMeeting and CHiME-6 datasets as well.
 
 ::right::
 <br>
@@ -587,7 +608,7 @@ $$
 s_{nft}|r_{ft} \sim \mathcal{N}_{\mathbb{C}}(0,r_{ft} \lambda_{nft})
 $$
 
-where the impulsive variable $r$ is a random positive variable. By assuming different prior model for $r$ and marginalizing it, we obtain two types of heavy-tailed model families.
+with an random impulsive variable $r$. Marginalizing $r$ with different prior $p(r)$ leads to different heavy-tailed model families, e.g.,
 
 $$
 \begin{array}{rlr}&{\mathbf{x}_{ft}\sim\mathcal{GG}_{\mathbb{C}}^{\beta}\left(0,\mathbf{Y}_{ft}\right)}&{\mathrm{(Leptokurtic)},}&\\
@@ -596,8 +617,6 @@ $$
 <!-- Notice that the vanilla Gaussian variance implies $r$ is a deterministic variable. -->
 
 Combined with the neural FCASA, we call this **Heavy-tailed FCASA** [Mao et al., 2026b][^2]
-<br>
-
 <br>
 
 [^2]: Neural Multichannel Distant Speaker Diarization with Heavy-tailed Source Separation Model
@@ -624,7 +643,7 @@ layout: pageBar
 # Shape parameters of the heavy-tailedness
 <br>
 
-The Leptokurtic Generalized Gaussian distribution and the Student's t-distribution have **shape parameters** $\nu \in [0,2)$ and $\beta \in (0,+\infty)$, respectively. The shape parameter controls the degree of heavy-tailedness.
+The Leptokurtic Generalized Gaussian distribution and the Student's t-distribution have **shape parameters** $\nu \in (0,+\infty)$ and $\beta \in [0,2)$, respectively. The shape parameter controls the degree of heavy-tailedness.
 
 <div class="flex mt-3 justify-center">
 <img class="h-80" src="/heavy-tail-models.png"/>
@@ -649,10 +668,10 @@ layout: twoCols
 <br>
 
 ::left::
-We choose different shape parameters for the two heavy-tailed models and verify their effectiveness on the AMI dataset.
+Choose different shape parameters for the heavy-tailed models and verify their effectiveness on the AMI dataset.
 
-- For some shape parameters, we observe consistently better performance than the baseline model (without heavy-tailed variance modeling).
-- Following experiments on AliMeeting and CHiME-6 demonstrates the efficacy of our methods on broader datasets
+- Consistently better performance than the baseline (for certain shape parameters).
+- Efficacy on AliMeeting and CHiME-6 datasets.
 
 ::right::
 <br>
@@ -668,8 +687,8 @@ layout: twoCols
 
 ::left::
 We combine both improvements together as they are independent modifications on the neural FCASA.
-- We choose $m=0.5,\lambda=4.0$ for the Beta FCASA and $\nu=1$ for the Heavy-tailed FCASA with Student's t-distribution.
-- We notice that the heavy-tailed FCASA and Beta FCASA model are compatible, the joint FCASA model, leading to better performance than individual improvements on AMI dataset.
+- Choose $m=0.5,\lambda=4.0$ for the Beta FCASA and $\nu=1$ for the Heavy-tailed FCASA with Student's t-distribution.
+- Heavy-tailed FCASA and Beta FCASA model are compatible, and the joint FCASA model is better than individual improvements on AMI dataset.
 - On AliMeeting and CHiME-6 datasets, the joint FCASA model consistently outperforms the baseline.
 
 ::right::
