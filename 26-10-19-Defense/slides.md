@@ -14,6 +14,12 @@ canvasWidth: 1080
 aspectRatio: 16/9
 ---
 
+<span text-white text-20px> Funded by ANR JCJC SAROUMANE</span>
+<br>
+<span text-white text-20px> Supervisors: Roland Badeau, Anthony Larcher, Mathieu Fontaine</span>
+<br>
+<span text-white text-20px> Jury members: Laurent Girin, Jean-François Bonastre, Angélique Drémeau, Roland Badeau, (Lukas Burget)</span>
+
 ---
 layout: pageBar
 hideInToc: true
@@ -38,17 +44,18 @@ layout: pageBar
 ### Objective: Decide who speaks when
 - Who: *Identify* the active speakers.
 - When: Find the *boundary* of their speech/voice activity.
+- Application: Meeting transcription.
 <v-click>
 
 ### Data
 - Input: Mono-channel/Multi-channel audio
 - Output: Rich Transcription Time Marked (RTTM) file
 <br>
-which stores file type, file name, channel ID, begin time, duration, speaker ID.
 ```csv
-SPEAKER ES2005a 1 0.00 1.25 <NA> <NA> 1 <NA> <NA>
-SPEAKER ES2005a 1 1.10 2.10 <NA> <NA> 2 <NA> <NA>
-SPEAKER ES2005a 1 3.50 1.00 <NA> <NA> 1 <NA> <NA>
+file type, file name, channel ID, begin time, duration, speaker ID.
+SPEAKER,   ES2005a,   1,          0.00,       1.25,     1,
+SPEAKER,   ES2005a,   1,          1.10,       2.10,     2,
+SPEAKER,   ES2005a,   1,          3.50,       1.00,     1,
 ```
 <img class="w-100%" src="/rttm.png" alt="RTTM Example" />
 </v-click>
@@ -229,8 +236,8 @@ layout: pageBar
 
 ### Paradigms based on the modeling approach
 - Data-driven:
-  - Large data for end-to-end training (e.g. EEND [Fujita et al., 2020])
-  - Large parameter with LLM backbone (e.g. VibeVoice-ASR [Peng et al., 2026])
+  - Large data for end-to-end training (e.g. EEND <span text-gray>[Fujita et al., 2019]</span>)
+  - Large parameter with LLM backbone (e.g. VibeVoice-ASR <span text-gray>[Peng et al., 2026]</span>)
 
 - Model-driven/Hybrid: Exploit prior knowledge with DSP models. 
 <!-- - Particularly with signal models to exploit **multi-channel** information. -->
@@ -264,41 +271,54 @@ layout: twoCols
 2. Extract speaker representations from the segments.
 3. Cluster the speaker representations based on similarity scores.
 
-::right::
-<img class="w-100%" src="/ahc.png"/>
+<br>
 
-::bottom::
-<v-click>
+<br>
+
+<div v-click=1>
 
 ### Core components
 - Speaker embedding extractor
-  - Representation learning with discriminative loss, e.g., cross-entropy loss, margin loss.
+  - Representation learning with discriminative loss.
   - Trained on single speaker recordings only.
-- Scoring method: cosine similarity (simple) v.s. PLDA (probabilistic).
-- Clustering algorithm: AHC (time-independent) v.s. VB-HMM (time-dependent).
+- Scoring method: cosine similarity v.s. PLDA.
+- Clustering algorithm: AHC v.s. VB-HMM.
+</div>
 
-</v-click>
+::right::
+<img class="w-100%" src="/ahc.png"/>
+
+<div v-click=1>
+
+<img class="w-100%" src="/aam_loss.png"/>
+</div>
+
 ---
-layout: pageBar
+layout: twoCols
 ---
 
 # Multi-label classification paradigm
 <br>
 
-### End-to-end neural diarization (EEND) [add a figure here and add a citation]
+::left::
+### End-to-end neural diarization (EEND) <br> <span text-gray>[Fujita et al., 2019]</span>
 - Per-frame multi-label classification formulation.
 - Permutation-invariant training (PIT) handles the label ambiguity.
 - Model the speaker- & time- variability.
 - Large synthetic data.
+::right::
+<img class="w-90%" src="/pit.png"/>
 
-<br>
+::bottom::
+<v-click>
 
 ### Following works
-- Stronger time-modeling backbone: EEND-EDA.
-- Leverage multi-channel information: Multi-channel EEND.
-- Joint source separation and diarization: EEND-SS.
+- Stronger time-modeling backbone: EEND-EDA <span text-gray>[Horiguchi et al., 2022a]</span>.
+- Leverage multi-channel information: Multi-channel EEND <span text-gray>[Horiguchi et al., 2022b]</span>.
+- Joint source separation and diarization: EEND-SS <span text-gray>[Maiti et al., 2023]</span>.
 
 However, these models are still problematic: data-hungry, synthetic v.s. real gap.
+</v-click>
 
 ---
 layout: pageBar
@@ -335,7 +355,8 @@ layout: pageBar
 # Model-driven separation
 <br>
 
-A common **generative model** for multichannel SS. Consider the representation in TF domain with $f$ and $t$ as the frequency and time indices.
+A common **generative model** for multichannel SS <span text-gray>[Vincent 2011]</span>.
+Consider the representation in TF domain with $f$ and $t$ as the frequency and time indices.
 <!-- We begin with a common generative model for multichannel source separation. -->
 
 Denote $\lambda_{nft}$ the **PSD** of speaker $n$, the signal $s_{nft}$ is generated from the **Gaussian variance modeling**:
@@ -361,7 +382,7 @@ layout: pageBar
 # Source separation with hybrid models
 <br>
 
-### Neural Full-rank Covariance Analysis (Neural FCA)
+### Neural Full-rank Covariance Analysis (Neural FCA) <span text-gray>[Bando et al., 2023]</span>
 
 A **deep generative model** for the source PSD, with a deep spectral feature $\mathbf{z}_{nt}$ and a neural network $g_{\theta, f}(\cdot)$:
 <!-- On top of the common generation model for multichannel source separation, the neural FCA introduces a deep generative model for the source PSD, with a deep spectral feature $\mathbf{z}_{nt}$ and a neural network $g_{\theta, f}(\cdot)$: -->
@@ -374,8 +395,8 @@ $$
 $$
 
 ### Hybrid inference
-- Infer $g$ with variational autoencoder (VAE).
-- Infer $\lambda_{nft}$ and $\mathbf{R}_{nf}$ with iterative source steering method (ISS).
+- Infer $g$ with variational autoencoder (VAE) <span text-gray>[Kingma et al., 2014a]</span>.
+- Infer $\lambda_{nft}$ and $\mathbf{R}_{nf}$ with iterative source steering method (ISS) <span text-gray>[Scheibler et al., 2020]</span>.
 
 **Blind source separation**: completely unsupervised, no need of clean separated signals.
 <!-- **Blind source separation**: completely unsupervised, does not need supervised training with clean separated signals. -->
@@ -387,7 +408,7 @@ layout: pageBar
 # Joint separation and diarization
 <br>
 
-### Neural FCA with Speaker Activity (Neural FCASA) [Bando et al., 2024]
+### Neural FCA with Speaker Activity (Neural FCASA) <span text-gray>[Bando et al., 2024]</span>
 A joint separation and diarization framework that incorporates speaker activity mask $u_{nt}\in \{0,1\}$:
 
 $$
@@ -405,32 +426,37 @@ From a separation perspective: a separation model with diarization annotations a
 <span text-red-600>From a diarization perspective: a diarization model incorporating prior knowledge from SS.</span>
 
 ---
-layout: pageBar
+layout: twoCols
+ratio: "1:2"
 ---
 
 # Objective of neural FCASA
 <br>
 
-Diarization and separation are formalized as solving two probabilitic models:
+<!-- Diarization and separation are formalized as solving two probabilitic models: -->
+::left::
 
-<div text-center>
+- Diarization: $p(\mathbf{U}\mid\mathbf{X})$
+- Separation: $p(\mathbf{Z}\mid\mathbf{X})$
 
-Diarization: $p(\mathbf{U}\mid\mathbf{X})$, and Separation: $p(\mathbf{Z}\mid\mathbf{X})$
+They are intractable -> <br> variational inference.
+
+<div v-click=1>
+Surrogate models:
+
+- $q_{\mathbf{\phi}}(\mathbf{Z}\mid\mathbf{X})\triangleq\prod_{n,t,d=1}^{N,T,D}\mathcal{N}(z_{ntd}~;~{\mathbf{\mu}}_{\mathbf{\phi},ntd},{\mathbf{\sigma}}_{\mathbf{\phi},ntd}^{2})$
+- $q_{\mathbf{\phi}}(\mathbf{U}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Bernoulli}(u_{nt};{\mathbf{\eta}}_{\mathbf{\phi},nt})$
+</div>
+
+::right::
+
+<div v-click=2>
+<div class="flex justify-center">
+<img class="w-full" src="/neuralfcasa-overview.png"/>
+</div>
 
 </div>
 
-However it is intractable to learn $p(\mathbf{X,U})$ -> variational inference.
-
-Proposing two surrogate models
-
-$$
-\begin{array}{l}
-q_{\mathbf{\phi}}(\mathbf{Z}\mid\mathbf{X})\triangleq\prod_{n,t,d=1}^{N,T,D}\mathcal{N}(z_{ntd}~;~{\mathbf{\mu}}_{\mathbf{\phi},ntd},{\mathbf{\sigma}}_{\mathbf{\phi},ntd}^{2}),\\
-q_{\mathbf{\phi}}(\mathbf{U}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Bernoulli}(u_{nt};{\mathbf{\eta}}_{\mathbf{\phi},nt}),
-\end{array}
-$$
-
-and computing a tractable evidence lower bound (ELBO) for the likelihood.
 ---
 layout: pageBar
 ---
@@ -438,14 +464,15 @@ layout: pageBar
 # Variational Inference (VI)
 <br>
 
+Optimize evidence lower bound (ELBO):
 $$
 \log p_{\theta}(\mathbf{X},\mathbf{U})\geq\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{Z}\mid\mathbf{X})}[\log p_{\theta}(\mathbf{X}\mid\mathbf{U},\mathbf{Z})]}_{\mathcal{L}_{recons}^{(sep)}}
 \underbrace{-\mathrm{KL}[q_{\phi}(\mathbf{Z}\mid\mathbf{X})\mid\mid p_{\theta}(\mathbf{Z})]}_{\mathcal{L}_{kl}^{(sep)}}+\underbrace{\log p(\mathbf{U})}_{\mathcal{L}^{(diar)}},
 $$
 
-$\mathcal{L}_{recons}^{(sep)}$ and $\mathcal{L}_{kl}^{(sep)}$: ELBO [Kingma et al., 2014a] for separation model, with a teacher-forcing trick ($\mathbf{U}$).
+$\mathcal{L}_{recons}^{(sep)}$ and $\mathcal{L}_{kl}^{(sep)}$: ELBO <span text-gray>[Kingma et al., 2014a]</span> for separation model, with a teacher-forcing trick ($\mathbf{U}$).
 
-$\mathcal{L}^{(diar)}$: The prior $p(\mathbf{U})$ is not defined in the generative model, instead, use $\log q_{\phi}(\mathbf{U}|\mathbf{X})$ as an approximation. Similar to semi-supervised VAE loss [Kingma et al., 2014b].
+$\mathcal{L}^{(diar)}$: The prior $p(\mathbf{U})$ is not defined in the generative model, instead, use $\log q_{\phi}(\mathbf{U}|\mathbf{X})$ as an approximation. Similar to semi-supervised VAE loss <span text-gray>[Kingma et al., 2014b]</span>.
 
 <br>
 
@@ -468,13 +495,13 @@ $$
 {u_{nt}\sim\operatorname{Bernoulli}(\eta_{nt})}\end{array}
 $$
 
-<br>
-
 Intuitively, the prior model may capture prior knowledge about the speaker activity patterns, including:
   1. the speaker's character, e.g., whether he/she is outgoing or shy to speak,
   2. the ambiance of the conversation, e.g., whether it is encouraging or discouraging for the attendees to speak.
 
-When combined with neural FCASA, we call it **Beta FCASA** [Mao et al., 2026a][^1].
+Combined with neural FCASA, we call it **Beta FCASA** <span text-gray>[Mao et al., 2026a]</span>[^1].
+<br>
+
 <br>
 
 <br>
@@ -484,27 +511,43 @@ When combined with neural FCASA, we call it **Beta FCASA** [Mao et al., 2026a][^
 [^1]: Neural Multichannel Distant Speaker Diarization and Source Separation with Beta Speaker Activity Prior
 
 ---
-layout: pageBar
+layout: twoCols
+ratio: "1:2"
 ---
 
 # VI in Beta FCASA
 <br>
 
+::left::
 Inference model:
-$$
-{q_{\phi}(\mathbf{H}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Beta}\left(\eta_{nt}~\big|~\alpha_{\phi, nt},\beta_{\phi,nt}\right),}
-$$
 
-ELBO for the joint likelihood now becomes:
-$$
+$q_{\phi}(\mathbf{H}\mid\mathbf{X})\triangleq\prod_{n,t=1}^{N,T}\mathrm{Beta}\left(\eta_{nt}~\big|~\alpha_{\phi, nt},\beta_{\phi,nt}\right),$
+
+<div v-click=1>
+
+$\mathcal{L}^{(diar)}$ becomes:
+
+$\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{H})}[\log p_{\theta}(\mathbf{U}\mid\mathbf{H})]}_{\mathcal{L}_{recons}^{(diar)}}-\\\underbrace{D_{\mathrm{KL}}(q_{\phi}(\mathbf{H})\| p_{\theta}(\mathbf{H}))}_{\mathcal{L}_{kl}^{(diar)}}$
+
+<!-- $$
 \begin{aligned}
 \log p_{\theta}(\mathbf{X},\mathbf{U})
 &\geq\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{Z}\mid\mathbf{X},\mathbf{U})}[\log p_{\theta}(\mathbf{X}\mid\mathbf{U},\mathbf{Z})]}_{\mathcal{L}_{recons}^{(sep)}}\underbrace{-D_{\mathrm{KL}}[q_{\phi}(\mathbf{Z}\mid\mathbf{X})\| p_{\theta}(\mathbf{Z})]}_{\mathcal{L}_{kl}^{(sep)}}\\
 &+\underbrace{\mathbb{E}_{q_{\phi}(\mathbf{H})}[\log p_{\theta}(\mathbf{U}\mid\mathbf{H})]}_{\mathcal{L}_{recons}^{(diar)}}\underbrace{-D_{\mathrm{KL}}(q_{\phi}(\mathbf{H})\| p_{\theta}(\mathbf{H}))}_{\mathcal{L}_{kl}^{(diar)}},
 \end{aligned}
-$$
+$$ -->
 
 i.e., for the diarization likelihood, we optimize explicitly its ELBO function.
+</div>
+
+::right::
+
+<div v-click=2>
+<div class="flex justify-center">
+<img class="w-full" src="/beta-overview.png"/>
+</div>
+
+</div>
 
 ---
 layout: pageBar
@@ -532,8 +575,8 @@ layout: pageBar
 Under the canonical parametrization, the PDF of Beta distribution is:
 $$\mathrm{Beta}(u;\alpha,\beta) = \frac{u^{\alpha-1}(1-u)^{\beta-1}}{B(\alpha,\beta)}, \quad u \in (0, 1)$$
 
-- the shape parameters $\alpha$ and $\beta$ has no interpretable statistical meaning.
-- Reparametrization in terms of *mode* $m$ and *concentration* $\lambda$ by the PERT parametrization (Malcolm et al. 1959):
+- the parameters $\alpha$ and $\beta$ do not directly control the shape of the PDF.
+- Reparametrization in terms of *mode* $m$ and *concentration* $\lambda$ by the PERT parametrization <span text-gray>[Malcolm et al., 1959]</span>:
 
 $$
 \begin{align*}
@@ -564,17 +607,6 @@ An illustration of the shape of Beta distribution w.r.t. its parametrization:
 In short, under PERT parametrization, we can directly optimize the shape.
 
 ---
-layout: pageBar
----
-
-# Wrap-up
-<br>
-
-<div class="flex mt-3 justify-center">
-<img class="h-100" src="/beta-overview.png"/>
-</div>
-
----
 layout: twoCols
 ---
 
@@ -588,8 +620,23 @@ We choose different $m,\lambda$ for the prior model $p(\mathbf{H})$, and verify 
 - Efficacy on AliMeeting and CHiME-6 datasets as well.
 
 ::right::
+Results on AMI dataset
+<img src="/beta-result-ami.png"/>
+
+---
+layout: twoCols
+---
+
+# Experiments and results
 <br>
-<img src="/beta-result.png"/>
+
+::left::
+<div text-center>Results on AliMeeting dataset</div>
+<img src="/beta-result-ali.png"/>
+
+::right::
+<div text-center>Results on CHiME-6 dataset</div>
+<img src="/beta-result-chime6.png"/>
 
 ---
 layout: pageBar
@@ -602,39 +649,47 @@ layout: pageBar
 - However speech signal shows more **heavy-tailedness**.
 - We consider a heavy-tailed extension to the variance modeling in the **separation model**!
 
+<div v-click=1>
+
 Under the **Gaussian Scalar Mixture (GSM)** model formulation:
 
 $$
 s_{nft}|r_{ft} \sim \mathcal{N}_{\mathbb{C}}(0,r_{ft} \lambda_{nft})
 $$
 
-with an random impulsive variable $r$. Marginalizing $r$ with different prior $p(r)$ leads to different heavy-tailed model families, e.g.,
+with an random impulsive variable $r$.
+<br>
+Marginalizing $r$ with different prior $p(r)$ leads to different heavy-tailed model families, e.g.,
 
 $$
 \begin{array}{rlr}&{\mathbf{x}_{ft}\sim\mathcal{GG}_{\mathbb{C}}^{\beta}\left(0,\mathbf{Y}_{ft}\right)}&{\mathrm{(Leptokurtic)},}&\\
-&{\mathbf{x}_{ft}\sim\mathcal{T}_{\mathbb{C}}^{\nu}\left(0,\mathbf{Y}_{ft}\right)}&{\mathrm{(Student~s~t)},}\end{array}
+&{\mathbf{x}_{ft}\sim\mathcal{T}_{\mathbb{C}}^{\nu}\left(0,\mathbf{Y}_{ft}\right)}&{\mathrm{(Student's~t)},}\end{array}
 $$
 <!-- Notice that the vanilla Gaussian variance implies $r$ is a deterministic variable. -->
 
-Combined with the neural FCASA, we call this **Heavy-tailed FCASA** [Mao et al., 2026b][^2]
+Combined with the neural FCASA, we call this **Heavy-tailed FCASA** <span text-gray>[Mao et al., 2026b][^2]</span>
 <br>
 
 [^2]: Neural Multichannel Distant Speaker Diarization with Heavy-tailed Source Separation Model
+</div>
 
 ---
-layout: pageBar
+layout: twoCols
+ratio: "1:2"
 ---
 
 # VI in Heavy-tailed FCASA
 <br>
 
+::left::
 Inference model: same
 
-ELBO function: 
+$\mathcal{L}_{recons}^{(sep)}$ becomes to the heavy-tailed version.
 
-1. $\mathcal{L}_{recons}^{(sep)}$ changes to the heavy-tailed version.
-2. $\mathcal{L}_{kl}^{(sep)}$ remains the same as in the Gaussian case, as the prior of the latent feature $\mathbf{z}$ remains the same.
-3. $\mathcal{L}^{(diar)}$ remains the same.
+::right::
+<div class="flex justify-center">
+<img class="w-full" src="/heavy-overview.png"/>
+</div>
 
 ---
 layout: pageBar
@@ -647,17 +702,6 @@ The Leptokurtic Generalized Gaussian distribution and the Student's t-distributi
 
 <div class="flex mt-3 justify-center">
 <img class="h-80" src="/heavy-tail-models.png"/>
-</div>
-
----
-layout: pageBar
----
-
-# Wrap-up
-<br>
-
-<div class="flex mt-3 justify-center">
-<img class="h-100" src="/heavy-overview.png"/>
 </div>
 
 ---
@@ -674,9 +718,24 @@ Choose different shape parameters for the heavy-tailed models and verify their e
 - Efficacy on AliMeeting and CHiME-6 datasets.
 
 ::right::
+Results on AMI dataset
+<img src="/heavy-result-ami1.png"/>
+<img src="/heavy-result-ami2.png"/>
+
+---
+layout: twoCols
+---
+
+# Experiments and results
 <br>
-<img src="/heavy-result1.png"/>
-<img src="/heavy-result2.png"/>
+
+::left::
+Results on AliMeeting dataset
+<img src="/heavy-result-ali.png"/>
+
+::right::
+Results on CHiME-6 dataset
+<img src="/heavy-result-chime6.png"/>
 
 ---
 layout: twoCols
@@ -744,3 +803,59 @@ layout: pageBar
 ---
 layout: end
 ---
+
+---
+layout: twoCols
+ratio: "3:2"
+---
+
+# Regularization of speaker embedding
+<br>
+
+::left::
+### Hierarchical latent variable model
+We model the speaker embedding as generated from a hierarchical latent variable model.
+
+$$
+\begin{align}
+\mathbf{y}_i &\sim p(\mathbf{y}) = \mathcal{N}(\mathbf{y};\mathbf{0},\mathbf{I})\\
+\mathbf{z}_{i}|\mathbf{y}_{i}=\mathbf{y}&\sim p(\mathbf{z}|\mathbf{y})=\mathcal{N}(\mathbf{z};f_{\boldsymbol{\theta}}(\mathbf{y}),\mathbf{I}),\\
+\mathbf{x}_{i}|\mathbf{z}_i=\mathbf{z}&\sim p(\mathbf{x}|\mathbf{z})=\mathcal{N}(\mathbf{x};g_{\boldsymbol{\theta}}(\mathbf{z}),\mathbf{I}).
+\end{align}
+$$
+
+### Inference by an HVAE
+
+$$
+\begin{align}
+q_{\phi}(\mathbf{y},\mathbf{z}|\mathbf{x}) &= q_{\phi}(\mathbf{y}|\mathbf{x})q_{\phi}(\mathbf{z}|\mathbf{y},\mathbf{x}),\\
+q_{\phi}(\mathbf{y}|\mathbf{x}) &= \mathcal{N}(\mathbf{y};\boldsymbol{\mu}_{\mathbf{y}, \phi}(\mathbf{x}),\boldsymbol{\Sigma}_{\mathbf{y}, \phi}(\mathbf{x})),\\
+q_{\phi}(\mathbf{z}|\mathbf{y},\mathbf{x}) &= \mathcal{N}(\mathbf{z};\boldsymbol{\mu}_{\mathbf{z}, \phi}(\mathbf{y},\mathbf{x}),\boldsymbol{\Sigma}_{\mathbf{z}, \phi}(\mathbf{y},\mathbf{x})).
+\end{align}
+$$
+
+::right::
+
+<div>
+<img class="h-100" src="/hvae.png"/>
+</div>
+
+---
+layout: pageBar
+---
+
+# VI in HVAE
+<br>
+
+The ELBO function can be written as
+$$
+\begin{equation}
+    \mathcal{L}(\mathbf{x}; \theta,\phi)=\mathbb{E}_{q_\phi(\mathbf{y}|\mathbf{x})q_\phi(\mathbf{z}|\mathbf{y},\mathbf{x})}\left[\log p(\mathbf{x}|\mathbf{z})\right]-\text{KL}({q(\mathbf{y},\mathbf{z}|\mathbf{x})}\|{p(\mathbf{y},\mathbf{z})})
+\end{equation}
+$$
+where the first term is the reconstruction loss and the second term can be further expanded as
+$$
+\begin{equation}
+    \text{KL}({q(\mathbf{y},\mathbf{z}|\mathbf{x})}\|{p(\mathbf{y},\mathbf{z})})=\text{KL}({q(\mathbf{y}|\mathbf{x})}\|{p(\mathbf{y})})+\mathbb{E}_{q(\mathbf{y}|\mathbf{x})}[\text{KL}({q(\mathbf{z}|\mathbf{y},\mathbf{x})}\|{p(\mathbf{z}|\mathbf{y})})].
+\end{equation}
+$$

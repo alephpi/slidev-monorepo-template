@@ -10,7 +10,14 @@ export default {
     meeting: {
       type: String,
     },
-  }
+  },
+  computed: {
+    // Slide number of `layout: end`; falls back to the real total
+    totalPages() {
+      const { slides, total } = this.$slidev.nav
+      return slides.find(s => s.meta.slide.frontmatter.layout === 'end')?.no ?? total
+    },
+  },
 }
 </script>
 
@@ -26,9 +33,8 @@ export default {
     <div class="w-1/3 flex justify-end">
       <slot />
     </div>
-    <div class="w-1/20 pr-2 flex justify-end">
-      <SlideCurrentNo /> /
-      <SlidesTotal />
+    <div v-if="$slidev.nav.currentPage <= totalPages" class="w-1/20 pr-2 flex justify-end">
+      <SlideCurrentNo /> / <span>{{ totalPages - 1 }}</span>
     </div>
   </div>
 </template>
